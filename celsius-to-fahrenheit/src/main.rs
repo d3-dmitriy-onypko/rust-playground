@@ -40,11 +40,11 @@ fn main() {
     }
 }
 
-fn read_from_input() -> Result<i32, &'static str> {
+fn read_from_input() -> Result<i32, ()> {
     let mut buffer = String::new();
     io::stdin().read_line(&mut buffer).expect("failed to read");
     match buffer.trim_end().parse() {
         Ok(k) => return Ok(k),
-        Err(_) => return Err("Invalid value"),
+        Err(_) => return Err(()),
     };
 }
