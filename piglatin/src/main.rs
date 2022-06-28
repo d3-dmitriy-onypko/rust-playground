@@ -30,7 +30,22 @@ fn main() {
         }
     }
 
-    
+    let mut piglatin_words = Vec::new();
+
+    for word in words {
+        let first_char = word.chars().nth(0).unwrap();
+        if CONSONANTS.contains(&first_char.to_lowercase().to_string().as_str()) {
+            let except_first_char = word.chars().skip(1).collect::<String>();
+            piglatin_words.push(format!("{}-{}ay", except_first_char, first_char));
+        }
+        else {
+            piglatin_words.push(format!("{}-ay", word));
+        }
+    }
+
+    dbg!(piglatin_words);
+
+
 
 // fn get_words_from_input() -> Vec<&'static str> {
 //     loop {
