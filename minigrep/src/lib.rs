@@ -24,30 +24,38 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(args: &[String]) -> Result<Config, &'static str> {
+    pub fn new(mut args: impl Iterator<Item = String>) -> Result<Config, &'static str> {
+        args.next();
+
+        let query = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a query string"),
+        };
+
+        let filename = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a file name"),
+        };
+
         let ignore_case = env::var("IGNORE_CASE").is_ok();
 
-        match args.len() {
-            3 => Ok(Config {
-                query: args[1].clone(),
-                filename: args[2].clone(),
-                ignore_case,
-            }),
-            i if i > 3 => Err("too many arguments"),
-            _ => Err("Usage: {{query}} {{filename}}"),
+        if args.peekable().peek().is_some() {
+            return Err("Too many arguments");
         }
+
+        Ok(Config {
+            query,
+            filename,
+            ignore_case,
+        })
     }
 }
 
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    let mut vec = vec![];
-    for line in contents.lines().filter(|line| line.len() >= query.len()) {
-        if line.contains(query) {
-            vec.push(line);
-        }
-    }
-
-    vec
+    contents
+        .lines()
+        .filter(|line| line.contains(query))
+        .collect()
 }
 
 pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
